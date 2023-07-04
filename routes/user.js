@@ -14,7 +14,7 @@ router.get("/",verifyToken,(req,res)=>{
 });
 
 router.get("/getAll", verifyToken, (req, res) => {
-    User.find((err, data) => {
+    User.find().then((data, err) => {
         if (err) {
           console.error('Error fetching table data:', err);
           res.status(500).send('Internal Server Error');
@@ -23,6 +23,7 @@ router.get("/getAll", verifyToken, (req, res) => {
         }
       });
 });
+
 
 // get user profile data (except password)
 router.get("/myprofile",verifyToken,async (req,res)=>{
