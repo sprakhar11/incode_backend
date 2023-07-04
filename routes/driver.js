@@ -12,14 +12,14 @@ router.get("/",verifyToken,(req,res)=>{
 });
 
 router.get("/getAll", verifyToken, (req, res) => {
-    Driver.find((err, data) => {
-        if (err) {
-          console.error('Error fetching table data:', err);
-          res.status(500).send('Internal Server Error');
-        } else {
-          res.send(data);
-        }
-      });
+    Driver.find().then((data, err) => {
+      if (err) {
+        console.error('Error fetching table data:', err);
+        res.status(500).send('Internal Server Error');
+      } else {
+        res.send(data);
+      }
+    });
 });
 
 
