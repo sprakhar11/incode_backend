@@ -1,16 +1,11 @@
 const mongoose = require("mongoose");
 
 const tripSchema = new mongoose.Schema({
-  tripId: {
+  userId: {
     type: String,
     required: true,
-    unique: true,
   },
   driverId: {
-    type: String,
-    required: true,
-  },
-  userId: {
     type: String,
     required: true,
   },

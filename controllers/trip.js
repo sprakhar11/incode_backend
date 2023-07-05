@@ -1,55 +1,100 @@
 const Trip = require("../models/tripSchema");
-const distanceMatrix = require("google-distance-matrix");
+
+const User = require("../models/User");
+const Driver = require("../models/Driver");
+// const { makeRequest } = require("../request");
+
+const axios = require("axios");
 
 // Function to calculate distance and time using Google Distance Matrix API
-const calculateDistanceAndTime = async (source, destination) => {
-  return new Promise((resolve, reject) => {
-    const config = {
-      key: "YOUR_GOOGLE_MAPS_API_KEY",
-      origins: [source],
-      destinations: [destination],
-    };
-
-    distanceMatrix.matrix(config, (err, response) => {
-      if (err) {
-        reject(err);
-      } else {
-        const distance = response.rows[0].elements[0].distance.value;
-        const time = response.rows[0].elements[0].duration.value;
-        resolve({ distance, time });
+const calculateDistance = async (sourceAddress, destinationAddress) => {
+  try {
+    // Geocode source address
+    const sourceResponse = await axios.get(
+      "https://nominatim.openstreetmap.org/search",
+      {
+        params: {
+          q: sourceAddress,
+          format: "json",
+          limit: 1,
+        },
       }
-    });
-  });
+    );
+
+    const sourceLatitude = parseFloat(sourceResponse.data[0].lat);
+    const sourceLongitude = parseFloat(sourceResponse.data[0].lon);
+
+    // Geocode destination address
+    const destinationResponse = await axios.get(
+      "https://nominatim.openstreetmap.org/search",
+      {
+        params: {
+          q: destinationAddress,
+          format: "json",
+          limit: 1,
+        },
+      }
+    );
+
+    const destinationLatitude = parseFloat(destinationResponse.data[0].lat);
+    const destinationLongitude = parseFloat(destinationResponse.data[0].lon);
+
+    // Calculate distance using latitude and longitude coordinates
+    const earthRadius = 6371; // Earth's radius in kilometers
+
+    const latDiff = (destinationLatitude - sourceLatitude) * (Math.PI / 180);
+    const lonDiff = (destinationLongitude - sourceLongitude) * (Math.PI / 180);
+
+    const a =
+      Math.sin(latDiff / 2) * Math.sin(latDiff / 2) +
+      Math.cos((sourceLatitude * Math.PI) / 180) *
+        Math.cos((destinationLatitude * Math.PI) / 180) *
+        Math.sin(lonDiff / 2) *
+        Math.sin(lonDiff / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = earthRadius * c;
+
+    return distance.toFixed(2); // Return the distance rounded to 2 decimal places
+  } catch (error) {
+    throw new Error(
+      "Failed to calculate distance using OpenStreetMap Nominatim API."
+    );
+  }
 };
 
 // POST /Create a new trip
 exports.createTrip = async (req, res) => {
-  try {
-    // Extract the necessary data from the request body
-    const {
-      tripId,
-      driverId,
-      userId,
-      sourceAddress,
-      destinationAddress,
-      distance,
-      time,
-      price,
-    } = req.body;
+  const { userId, driverId, sourceAddress, destinationAddress, price } =
+    req.body;
 
-    // Create the new trip
-    const newTrip = await Trip.create({
-      tripId,
-      driverId,
-      userId,
+  try {
+    // Check if the user and driver exist
+    const user = await User.findById(userId);
+    const driver = await Driver.findById(driverId);
+
+    if (!user || !driver) {
+      return res.status(404).json({ error: "User or driver not found" });
+    }
+
+    const distance = await calculateDistance(sourceAddress, destinationAddress);
+
+    const newTrip = new Trip({
+      userId: user._id,
+      driverId: driver._id,
       sourceAddress,
       destinationAddress,
       distance,
-      time,
       price,
     });
 
-    const savedTrip = await newTrip.save();
+    // await newTrip.save((error, savedTrip) => {
+    //   if (error) {
+    //     return res.status(500).json({
+    //       status: "error",
+    //       message: "Failed to save the new trip",
+    //     });
+    //   }
+    await newTrip.save();
 
     res.status(200).json({
       status: "success",
@@ -57,7 +102,9 @@ exports.createTrip = async (req, res) => {
         trip: newTrip,
       },
     });
-  } catch (err) {
+    // });
+  } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: "error",
       message: "Internal server error",
