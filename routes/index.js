@@ -7,6 +7,7 @@ const authRoute = require("./auth");
 const driverRoute = require("./driver");
 const tripRoutes = require("./tripRoutes");
 const bookmarkRoutes = require("./bookmarkRoutes");
+const rentalsRoutes = require("./rentalsRoutes");
 
 router.get("/", (req, res) => {
   res.send("Welcome to Incode Backend Api portal");
@@ -17,5 +18,6 @@ router.use("/api/auth", authRoute);
 router.use("/api/driver", driverRoute);
 router.use("/api/trips", tripRoutes);
 router.use("/api/bookmarks", bookmarkRoutes);
+router.use("/api/rentals", rentalsRoutes);
 
 module.exports = router;
