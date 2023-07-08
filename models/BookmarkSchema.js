@@ -21,6 +21,14 @@ const bookmarkSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  phoneNumber: {
+    type: String,
+    required: true,
+  },
+  tripDate: {
+    type: String,
+    required: true,
+  },
 });
 
 const Bookmark = mongoose.model("Bookmark", bookmarkSchema);

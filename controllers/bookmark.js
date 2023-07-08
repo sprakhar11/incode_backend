@@ -19,6 +19,8 @@ exports.createBookmark = async (req, res) => {
       userId: user._id,
       driverId: driver._id,
       driverName: driver.name,
+      phoneNumber: req.body.phoneNumber,
+      tripDate: req.body.tripDate
     });
 
     await bookmark.save();

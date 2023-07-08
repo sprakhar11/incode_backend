@@ -45,32 +45,6 @@ router.get("/myprofile",verifyToken,async (req,res)=>{
             res.status(500).json({ success: false, message: "server data not found" });
         }
 });
-// update user profile (test)
-router.patch("/myprofile",verifyToken, async(req,res)=>{
-        // update user profile here
-        // const salt=await bcrypt.genSalt(10);
-        // const hashedPass=await bcrypt.hash(req.body.password,salt);
-        id= req.user._id;
-       
-       
-        User.findByIdAndUpdate(id,{
-            name:req.body.name,
-            
-            // password:hashedPass,
-            admissionNumber:req.body.admissionNumber,
-            additionalDetails:req.body.additionalDetails
-            
-        }).then((user)=>{
-            // console.log(user.additionalDetails['hello']);
-            res.status(200).json({ success: true, message: "user profile updated Success" });
-        }).catch((error)=>{
-            console.log(error);
-            res.status(500).json({ success: false, message: "user profile not updated" });
-
-        });
-   
-    
-    });
     
 
     // additional Details test
