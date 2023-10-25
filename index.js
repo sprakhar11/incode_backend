@@ -14,23 +14,23 @@ connectdb(DATABASE_URL);
 const cors = require("cors");
 app.use(express.json()); // to parse the json files
 app.use(cors()); // to allow cross origin resource sharing
-config({ path: "./config/config.env" });
+// config({ path: "./config/config.env" });
 import paymentRoute from "./routes/paymentRoutes.js";
 import Razorpay from "razorpay";
 
 
 export const instance = new Razorpay({
-  key_id: process.env.RAZORPAY_API_KEY,
-  key_secret: process.env.RAZORPAY_APT_SECRET,
+  // key_id: process.env.RAZORPAY_API_KEY,
+  // key_secret: process.env.RAZORPAY_APT_SECRET,
 });
 
 // routes require
 const homeRoute = require("./routes/index");
 app.use("/api", paymentRoute);
 
-app.get("/api/getkey", (req, res) =>
-  res.status(200).json({ key: process.env.RAZORPAY_API_KEY })
-);
+// app.get("/api/getkey", (req, res) =>
+//   res.status(200).json({ key: process.env.RAZORPAY_API_KEY })
+// );
 app.use("/", homeRoute);
 
 app.use("", (req, res) => {
