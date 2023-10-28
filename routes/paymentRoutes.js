@@ -1,13 +1,24 @@
-import express from "express";
-import {
+const express = require("express");
+const dotenv=require("dotenv");
+dotenv.config();
+
+
+const  {
   checkout,
   paymentVerification,
-} from "../controllers/paymentController.js";
+} = require( "../controllers/paymentController" );
+
 
 const router = express.Router();
 
-// router.route("/checkout").post(checkout);
 
-// router.route("/paymentverification").post(paymentVerification);
+router.post("/checkout", checkout);
 
-export default router;
+router.route("/paymentverification").post(paymentVerification);
+
+router.get("/getkey", (req, res) =>
+  res.status(200).json({ key: process.env.RAZORPAY_API_KEY })
+);
+
+module.exports = router;
+

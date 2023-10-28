@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const app = express();
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 4000;
 const dotenv = require("dotenv");
 dotenv.config();
 const mongoose = require("mongoose");
@@ -12,20 +12,19 @@ console.log(DATABASE_URL);
 const connectdb = require("./database/database.js");
 connectdb(DATABASE_URL);
 const cors = require("cors");
-app.use(express.json()); // to parse the json files
 app.use(cors()); // to allow cross origin resource sharing
+app.use(express.json()); // to parse the json files
+app.use(express.urlencoded({ extended: true }));
 // config({ path: "./config/config.env" });
-import paymentRoute from "./routes/paymentRoutes.js";
-import Razorpay from "razorpay";
+// import paymentRoute from "./routes/paymentRoutes.js";
+const paymentRoute = require("./routes/paymentRoutes");
+// import Razorpay from "razorpay";
 
 
-export const instance = new Razorpay({
-  // key_id: process.env.RAZORPAY_API_KEY,
-  // key_secret: process.env.RAZORPAY_APT_SECRET,
-});
 
 // routes require
 const homeRoute = require("./routes/index");
+
 app.use("/api", paymentRoute);
 
 // app.get("/api/getkey", (req, res) =>
@@ -44,3 +43,7 @@ app.listen(port, (error) => {
     console.log("server started", port);
   }
 });
+
+// module.exports = {
+//   instance
+// }
